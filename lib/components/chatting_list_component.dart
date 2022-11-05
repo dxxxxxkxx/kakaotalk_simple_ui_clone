@@ -86,7 +86,7 @@ class ChattingListComponent extends StatelessWidget {
       if (lastMsgTime.hour == 12) {
         hour.write('12:');
       } else {
-        hour.write('${lastMsgTime.hour}:');
+        hour.write('${lastMsgTime.hour - 12}:');
       }
     }
 

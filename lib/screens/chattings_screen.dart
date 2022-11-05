@@ -5,9 +5,54 @@ import '../data/chatting.dart';
 import 'main_screen.dart';
 
 class ChattingsScreen extends StatelessWidget {
-  final List<Chatting> chattings;
+  final Map<String, List<Chatting>> _chattingMap = {};
+  final bool chattingsUnread;
+  final bool openChattingsUnread;
 
-  const ChattingsScreen({required this.chattings, Key? key}) : super(key: key);
+  ChattingsScreen({
+    required List<Chatting> chattings,
+    required List<Chatting> openChattings,
+    required this.chattingsUnread,
+    required this.openChattingsUnread,
+    Key? key,
+  }) : super(key: key) {
+    _chattingMap.addAll({'채팅': chattings, '오픈채팅': openChattings});
+  }
+
+  Widget _setTap({required String tabName, required bool unread}) {
+    return Tab(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tabName,
+            style: const TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+          ),
+          if (unread)
+            Container(
+              margin: const EdgeInsets.only(left: 4.0, top: 3.5),
+              width: 5.0,
+              height: 5.0,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+            )
+        ],
+      ),
+    );
+  }
+
+  Widget _setTabBarView({required List<Chatting> tabBarItem}) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+      itemCount: tabBarItem.length,
+      itemBuilder: (context, index) =>
+          ChattingListComponent(chatting: tabBarItem[index]),
+      separatorBuilder: (BuildContext context, int index) =>
+          const SizedBox(height: 28.0),
+    );
+  }
 
   Widget _setIconButton({required Widget icon}) {
     return IconButton(
@@ -26,22 +71,18 @@ class ChattingsScreen extends StatelessWidget {
         appBar: AppBar(
           elevation: 0.0,
           backgroundColor: Colors.black,
-          title: const TabBar(
+          title: TabBar(
             isScrollable: true,
-            indicator: BoxDecoration(),
+            indicator: const BoxDecoration(),
             unselectedLabelColor: greyColor,
             tabs: [
-              Tab(
-                child: Text(
-                  '채팅',
-                  style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
-                ),
+              _setTap(
+                tabName: _chattingMap.keys.elementAt(0),
+                unread: chattingsUnread,
               ),
-              Tab(
-                child: Text(
-                  '오픈채팅',
-                  style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
-                ),
+              _setTap(
+                tabName: _chattingMap.keys.elementAt(1),
+                unread: openChattingsUnread,
               )
             ],
           ),
@@ -54,17 +95,8 @@ class ChattingsScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              itemCount: chattings.length,
-              itemBuilder: (context, index) =>
-                  ChattingListComponent(chatting: chattings[index]),
-              separatorBuilder: (BuildContext context, int index) =>
-                  const SizedBox(height: 28.0),
-            ),
-            const Center(
-              child: Text('오픈채팅', style: TextStyle(color: Colors.white)),
-            )
+            _setTabBarView(tabBarItem: _chattingMap.values.elementAt(0)),
+            _setTabBarView(tabBarItem: _chattingMap.values.elementAt(1))
           ],
         ),
       ),

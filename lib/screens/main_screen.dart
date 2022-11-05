@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kakaotalk_simple_ui_clone/screens/chattings_screen.dart';
 
 import '../components/unread_cnt_chip.dart';
 import '../data/chatting.dart';
+import 'chattings_screen.dart';
 import 'friends_screen.dart';
 import 'more_screen.dart';
 import 'news_screen.dart';
@@ -19,7 +19,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final List<Chatting> _chattings = [];
+  final List<Chatting> _openChattings = [];
   final List<Widget> _screens = [];
+  int _chattingsUnreadCnt = 0;
+  int _openChattingsUnreadCnt = 0;
 
   _MainScreenState() {
     final DateTime now = DateTime.now();
@@ -31,13 +34,8 @@ class _MainScreenState extends State<MainScreen> {
             'https://upload.wikimedia.org/wikipedia/commons/7/72/180417_%EB%B3%B4%EC%95%84_01.png',
         title: '권보아',
         body: '사랑해❤️',
-        lastMsgTime: DateTime(
-          now.year,
-          now.month,
-          now.day,
-          now.hour,
-          now.minute - 1,
-        ),
+        lastMsgTime:
+            DateTime(now.year, now.month, now.day, now.hour, now.minute - 1),
         peopleCnt: 2,
         unreadCnt: 5,
       ),
@@ -50,13 +48,7 @@ class _MainScreenState extends State<MainScreen> {
             'https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjEwMDdfMjgx%2FMDAxNjY1MTI0NjEzOTQ2.zBI_Ptcar-W98osLVpC56ZikWn1zqgDEeYaPXSimmucg._k0G_oQSkI8gP6TuA_3I-K0T2ryauQoLXAro1g2CXRIg.JPEG.winsome0705%2Foutput_723617519.jpg&type=sc960_832',
         title: '채형원',
         body: 'ㅋㅋㅋㅋㅋㅋㅋ',
-        lastMsgTime: DateTime(
-          now.year,
-          now.month,
-          now.day,
-          now.hour - 1,
-          32,
-        ),
+        lastMsgTime: DateTime(now.year, now.month, now.day, now.hour - 1, 32),
         peopleCnt: 2,
         unreadCnt: 0,
       ),
@@ -142,8 +134,38 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
 
+    /* 1 */
+    _openChattings.add(
+      Chatting(
+        picture:
+            'https://static.wikia.nocookie.net/harrypotter/images/8/8d/Broomsticks.jpg/revision/latest?cb=20140603221848',
+        title: '빗자루 공동 구매',
+        body: '참여',
+        lastMsgTime: DateTime(
+            now.year, now.month, now.day, now.hour - 2, now.minute - 7),
+        peopleCnt: 187,
+        unreadCnt: 4,
+        notification: false,
+      ),
+    );
+
+    for (var e in _chattings) {
+      _chattingsUnreadCnt += e.unreadCnt;
+    }
+
+    for (var e in _openChattings) {
+      _openChattingsUnreadCnt += e.unreadCnt;
+    }
+
     _screens.add(const FriendsScreen());
-    _screens.add(ChattingsScreen(chattings: _chattings));
+    _screens.add(
+      ChattingsScreen(
+        chattings: _chattings,
+        openChattings: _openChattings,
+        chattingsUnread: _chattingsUnreadCnt > 0 ? true : false,
+        openChattingsUnread: _openChattingsUnreadCnt > 0 ? true : false,
+      ),
+    );
     _screens.add(const NewsScreen());
     _screens.add(const ShoppingScreen());
     _screens.add(const MoreScreen());
@@ -188,11 +210,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int unreadCnt = 0;
-
-    for (var e in _chattings) {
-      unreadCnt += e.unreadCnt;
-    }
+    int unreadCnt = _chattingsUnreadCnt + _openChattingsUnreadCnt;
 
     Widget? chip =
         unreadCnt > 0 ? UnreadCntChip(unreadCnt: unreadCnt, height: 1.0) : null;
