@@ -5,7 +5,7 @@ import '../data/chatting.dart';
 import 'chattings_screen.dart';
 import 'friends_screen.dart';
 import 'more_screen.dart';
-import 'news_screen.dart';
+import 'view_screen.dart';
 import 'shopping_screen.dart';
 
 const Color greyColor = Color(0xFF757575);
@@ -166,7 +166,7 @@ class _MainScreenState extends State<MainScreen> {
         openChattingsUnread: _openChattingsUnreadCnt > 0 ? true : false,
       ),
     );
-    _screens.add(const NewsScreen());
+    _screens.add(const ViewScreen());
     _screens.add(const ShoppingScreen());
     _screens.add(const MoreScreen());
   }
