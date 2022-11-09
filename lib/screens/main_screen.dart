@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../components/unread_cnt_chip.dart';
+import '../data/bottom_navigation_bar_item.dart' as bottom_navigation_bar_item;
 import '../data/chatting.dart';
 import 'chattings_screen.dart';
 import 'friends_screen.dart';
 import 'more_screen.dart';
-import 'view_screen.dart';
 import 'shopping_screen.dart';
+import 'view_screen.dart';
 
 const Color greyColor = Color(0xFF757575);
 
@@ -18,6 +19,44 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final List<bottom_navigation_bar_item.BottomNavigationBarItem>
+      _bottomNavigationBarItem = [
+    /* 1 */
+    bottom_navigation_bar_item.BottomNavigationBarItem(
+      icon: const Icon(Icons.person_outline),
+      activeIcon: const Icon(Icons.person),
+      label: '친구',
+    ),
+
+    /* 2 */
+    bottom_navigation_bar_item.BottomNavigationBarItem(
+      icon: const Icon(Icons.chat_bubble_outline),
+      activeIcon: const Icon(Icons.chat_bubble),
+      label: '채팅',
+    ),
+
+    /* 3 */
+    bottom_navigation_bar_item.BottomNavigationBarItem(
+      icon: const Icon(Icons.remove_red_eye_outlined),
+      activeIcon: const Icon(Icons.remove_red_eye),
+      label: '뷰',
+    ),
+
+    /* 4 */
+    bottom_navigation_bar_item.BottomNavigationBarItem(
+      icon: const Icon(Icons.shopping_bag_outlined),
+      activeIcon: const Icon(Icons.shopping_bag),
+      label: '쇼핑',
+    ),
+
+    /* 5 */
+    bottom_navigation_bar_item.BottomNavigationBarItem(
+      icon: const Icon(Icons.more_horiz_outlined),
+      activeIcon: const Icon(Icons.more_horiz),
+      label: '더보기',
+    )
+  ];
+
   final List<Chatting> _chattings = [];
   final List<Chatting> _openChattings = [];
   final List<Widget> _screens = [];
@@ -111,9 +150,9 @@ class _MainScreenState extends State<MainScreen> {
         picture: 'https://www.wwfkorea.or.kr/img/newbird/main/logo.png',
         title: '세계자연기금WWF-Korea',
         body: '''김도현 후원자님
-      
-      10월 판다메일에서는 WWF가 각국의 금융 당국에 강력한 정책을 촉구하는 내용으로 시작합니다.
-      WWF (세계자연기금)는 각국의 중앙은행과 금융감독기관이 기후변화와 생물 다양성 위기 대응에 보다 강력한 조치를 취할 것을 촉구하는 성명서를 발표했습니다.''',
+        
+        10월 판다메일에서는 WWF가 각국의 금융 당국에 강력한 정책을 촉구하는 내용으로 시작합니다.
+        WWF (세계자연기금)는 각국의 중앙은행과 금융감독기관이 기후변화와 생물 다양성 위기 대응에 보다 강력한 조치를 취할 것을 촉구하는 성명서를 발표했습니다.''',
         lastMsgTime: DateTime(now.year, now.month - 7, 18, 12, 9),
         peopleCnt: 1,
         unreadCnt: 0,
@@ -180,40 +219,57 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   BottomNavigationBarItem _setBottomNavigationBarItem({
-    required Widget icon,
-    required Widget activeIcon,
-    required String label,
+    required bottom_navigation_bar_item.BottomNavigationBarItem
+        bottomNavigationBarItem,
   }) {
     return BottomNavigationBarItem(
-      icon: Padding(padding: const EdgeInsets.only(top: 8.0), child: icon),
-      activeIcon:
-          Padding(padding: const EdgeInsets.only(top: 8.0), child: activeIcon),
-      label: label,
+      icon: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: bottomNavigationBarItem.icon,
+      ),
+      activeIcon: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: bottomNavigationBarItem.activeIcon,
+      ),
+      label: bottomNavigationBarItem.label,
     );
   }
 
-  Widget _setChattingIcon({required Widget icon, required Widget? chip}) {
-    return chip != null
-        ? Stack(
-            clipBehavior: Clip.none,
-            children: [
-              icon,
-              Positioned(
-                top: -8.0,
-                right: -12.0,
-                child: SizedBox(height: 18.0, child: FittedBox(child: chip)),
-              )
-            ],
-          )
-        : icon;
+  Widget _setChattingIcon({required Widget icon, required Widget chip}) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        icon,
+        Positioned(
+          top: -8.0,
+          right: -12.0,
+          child: SizedBox(height: 18.0, child: FittedBox(child: chip)),
+        )
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    int unreadCnt = _chattingsUnreadCnt + _openChattingsUnreadCnt;
+    final int unreadCnt = _chattingsUnreadCnt + _openChattingsUnreadCnt;
+    bottom_navigation_bar_item.BottomNavigationBarItem? bottomNavigationBarItem;
 
-    Widget? chip =
-        unreadCnt > 0 ? UnreadCntChip(unreadCnt: unreadCnt, height: 1.0) : null;
+    if (unreadCnt > 0) {
+      Widget chip = UnreadCntChip(unreadCnt: unreadCnt, height: 1.0);
+
+      bottomNavigationBarItem =
+          bottom_navigation_bar_item.BottomNavigationBarItem(
+        icon: _setChattingIcon(
+          icon: _bottomNavigationBarItem[1].icon,
+          chip: chip,
+        ),
+        activeIcon: _setChattingIcon(
+          icon: _bottomNavigationBarItem[1].activeIcon,
+          chip: chip,
+        ),
+        label: _bottomNavigationBarItem[1].label,
+      );
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -229,45 +285,21 @@ class _MainScreenState extends State<MainScreen> {
           selectedItemColor: Colors.white,
           unselectedItemColor: greyColor,
           items: [
-            /* 1 */
             _setBottomNavigationBarItem(
-              icon: const Icon(Icons.person_outline),
-              activeIcon: const Icon(Icons.person),
-              label: '친구',
+              bottomNavigationBarItem: _bottomNavigationBarItem[0],
             ),
-
-            /* 2 */
             _setBottomNavigationBarItem(
-              icon: _setChattingIcon(
-                icon: const Icon(Icons.chat_bubble_outline),
-                chip: chip,
-              ),
-              activeIcon: _setChattingIcon(
-                icon: const Icon(Icons.chat_bubble),
-                chip: chip,
-              ),
-              label: '채팅',
+              bottomNavigationBarItem:
+                  bottomNavigationBarItem ?? _bottomNavigationBarItem[1],
             ),
-
-            /* 3 */
             _setBottomNavigationBarItem(
-              icon: const Icon(Icons.remove_red_eye_outlined),
-              activeIcon: const Icon(Icons.remove_red_eye),
-              label: '뉴스',
+              bottomNavigationBarItem: _bottomNavigationBarItem[2],
             ),
-
-            /* 4 */
             _setBottomNavigationBarItem(
-              icon: const Icon(Icons.shopping_bag_outlined),
-              activeIcon: const Icon(Icons.shopping_bag),
-              label: '쇼핑',
+              bottomNavigationBarItem: _bottomNavigationBarItem[3],
             ),
-
-            /* 5 */
             _setBottomNavigationBarItem(
-              icon: const Icon(Icons.more_horiz_outlined),
-              activeIcon: const Icon(Icons.more_horiz),
-              label: '기타',
+              bottomNavigationBarItem: _bottomNavigationBarItem[4],
             )
           ],
         ),

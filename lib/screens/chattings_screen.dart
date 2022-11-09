@@ -5,6 +5,7 @@ import '../data/chatting.dart';
 import 'main_screen.dart';
 
 class ChattingsScreen extends StatelessWidget {
+  final List<String> tabBarName = ['채팅', '오픈채팅'];
   final Map<String, List<Chatting>> _chattingMap = {};
   final bool chattingsUnread;
   final bool openChattingsUnread;
@@ -16,7 +17,10 @@ class ChattingsScreen extends StatelessWidget {
     required this.openChattingsUnread,
     Key? key,
   }) : super(key: key) {
-    _chattingMap.addAll({'채팅': chattings, '오픈채팅': openChattings});
+    _chattingMap.addAll({
+      tabBarName[0]: chattings,
+      tabBarName[1]: openChattings,
+    });
   }
 
   Widget _setTap({required String tabName, required bool unread}) {

@@ -4,8 +4,11 @@ class UnreadCntChip extends StatelessWidget {
   final int unreadCnt;
   final double height;
 
-  const UnreadCntChip({required this.unreadCnt, required this.height, Key? key})
-      : super(key: key);
+  const UnreadCntChip({
+    required this.unreadCnt,
+    required this.height,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
