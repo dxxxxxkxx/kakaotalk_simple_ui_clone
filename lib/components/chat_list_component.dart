@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../data/chatting.dart';
-import '../screens/main_screen.dart';
-import 'unread_cnt_chip.dart';
+import '../data/chat.dart';
+import '../data/constants.dart';
+import 'unread_count_chip.dart';
 
-class ChattingListComponent extends StatelessWidget {
+class ChatListComponent extends StatelessWidget {
   final Icon _noPictureIcon = const Icon(
     Icons.person_outline,
     size: 32.0,
@@ -17,23 +17,26 @@ class ChattingListComponent extends StatelessWidget {
     foregroundColor: Colors.black,
     child: Text(
       '나',
-      style:
-          TextStyle(fontSize: 10.0, height: 1.2, fontWeight: FontWeight.bold),
+      style: TextStyle(
+        fontSize: 10.0,
+        height: 1.2,
+        fontWeight: FontWeight.bold,
+      ),
     ),
   );
 
-  final Chatting chatting;
+  final Chat chat;
   final List<Widget> _titleRow = [];
 
-  ChattingListComponent({required this.chatting, Key? key}) : super(key: key) {
-    if (chatting.myChatting) {
+  ChatListComponent({required this.chat, Key? key}) : super(key: key) {
+    if (chat.isMyChat) {
       _titleRow.add(_myCircleAvatar);
       _titleRow.add(const SizedBox(width: 8.0));
     }
 
     _titleRow.add(
       Text(
-        chatting.title,
+        chat.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style:
@@ -41,17 +44,17 @@ class ChattingListComponent extends StatelessWidget {
       ),
     );
 
-    if (chatting.peopleCnt >= 3) {
+    if (chat.peopleCnt >= 3) {
       _titleRow.add(const SizedBox(width: 8.0));
       _titleRow.add(
         Text(
-          '${chatting.peopleCnt}',
+          '${chat.peopleCnt}',
           style: const TextStyle(fontSize: 16.0, color: greyColor),
         ),
       );
     }
 
-    if (!chatting.notification) {
+    if (!chat.hasNotification) {
       _titleRow.add(const SizedBox(width: 8.0));
       _titleRow.add(
         const Icon(Icons.notifications_off, size: 16.0, color: greyColor),
@@ -59,12 +62,57 @@ class ChattingListComponent extends StatelessWidget {
     }
   }
 
-  Widget _setPicture({required String? picture}) {
-    if (picture != null) {
-      return Image.network(chatting.picture!, fit: BoxFit.cover);
+  Widget _getPicture({required String? pictureSrc}) {
+    if (pictureSrc != null && pictureSrc.isNotEmpty) {
+      return Image.network(pictureSrc, fit: BoxFit.cover);
     }
 
     return _noPictureIcon;
+  }
+
+  Widget _setPicture() {
+    return AspectRatio(
+      aspectRatio: 1,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: _getPicture(pictureSrc: chat.pictureSrc),
+      ),
+    );
+  }
+
+  Widget _setContents() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(children: _titleRow),
+        const SizedBox(height: 3.0),
+        Text(
+          chat.body,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Colors.white),
+        )
+      ],
+    );
+  }
+
+  Widget _setInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          _formatDateTime(chat.lastMsgTime),
+          style: const TextStyle(fontSize: 12.0, color: greyColor),
+        ),
+        const SizedBox(height: 8.0),
+        SizedBox(
+          height: 20,
+          child: chat.unreadCnt > 0
+              ? UnreadCountChip(unreadCnt: chat.unreadCnt, height: 0.5)
+              : null,
+        )
+      ],
+    );
   }
 
   String _formatDateTime(DateTime lastMsgTime) {
@@ -121,64 +169,11 @@ class ChattingListComponent extends StatelessWidget {
       onTap: () {},
       child: Row(
         children: [
-          /* 1 */
-          SizedBox(
-            width: 60.0,
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: _setPicture(picture: chatting.picture),
-              ),
-            ),
-          ),
-
-          /* 2 */
+          SizedBox(width: 60.0, child: _setPicture()),
           const SizedBox(width: 14.0),
-
-          /* 3 */
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: _titleRow),
-                const SizedBox(height: 3.0),
-                Text(
-                  chatting.body,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white),
-                )
-              ],
-            ),
-          ),
-
-          /* 4 */
+          Expanded(child: _setContents()),
           const SizedBox(width: 14.0),
-
-          /* 5 */
-          SizedBox(
-            width: 70.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  _formatDateTime(chatting.lastMsgTime),
-                  style: const TextStyle(fontSize: 12.0, color: greyColor),
-                ),
-                const SizedBox(height: 8.0),
-                SizedBox(
-                  height: 20,
-                  child: chatting.unreadCnt > 0
-                      ? UnreadCntChip(
-                          unreadCnt: chatting.unreadCnt,
-                          height: 0.5,
-                        )
-                      : null,
-                )
-              ],
-            ),
-          )
+          SizedBox(width: 70.0, child: _setInfo())
         ],
       ),
     );

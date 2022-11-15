@@ -1,22 +1,22 @@
-class Chatting {
-  String? picture;
+class Chat {
+  String? pictureSrc;
   String title;
   String body;
   DateTime lastMsgTime;
   int peopleCnt;
   int unreadCnt;
-  bool notification;
-  bool myChatting;
+  bool hasNotification;
+  bool isMyChat;
 
-  Chatting({
+  Chat({
     required this.title,
     required this.body,
     required this.lastMsgTime,
     required this.peopleCnt,
     required this.unreadCnt,
-    this.picture,
-    this.notification = true,
-    this.myChatting = false,
+    this.pictureSrc,
+    this.hasNotification = true,
+    this.isMyChat = false,
   }) {
     if (lastMsgTime.isUtc) {
       lastMsgTime = lastMsgTime.toLocal();
