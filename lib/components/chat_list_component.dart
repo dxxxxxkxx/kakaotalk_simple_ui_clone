@@ -146,12 +146,10 @@ class ChatListComponent extends StatelessWidget {
 
     if (!lastMsgTime.isBefore(DateTime(now.year, 1, 1))) {
       if (!lastMsgTime.isBefore(DateTime(now.year, now.month, now.day))) {
-        // today
-        return (hour..write(minute)).toString();
+        return (hour..write(minute)).toString(); // today
       } else if (!lastMsgTime
           .isBefore(DateTime(now.year, now.month, now.day - 1))) {
-        // yesterday
-        return '어제';
+        return '어제'; // yesterday
       }
 
       // this year ~ 3 days ago
